@@ -1,0 +1,9 @@
+# Files
+.vagrant
+
+ansible_key*
+
+join_command
+
+# Folders
+*/results/*.log*
