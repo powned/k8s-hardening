@@ -189,18 +189,16 @@ ERROR: for python  Cannot start service python: OCI runtime create failed: conta
 
 > **Kubernetes**
 
-
 1. Basic troubleshooting
-
 
 ```bash
 $ kubectl get nodes -o wide
 $ kubectl get po -n kube-system
 ```
 
+- [Kubernetes Legacy Package Repositories Will Be Frozen On September 13, 2023](https://kubernetes.io/blog/2023/08/31/legacy-package-repository-deprecation/)
 
 2. Network Plugin
-
 
 - The default CIDR range for **flannel** is `10.244.0.0/16`. If you are using `kubeadm init`, make sure to use `-–pod-network-cidr=10.244.0.0/16`. ***NOTE***: this project implement vagrant tests with `--pod-network-cidr=10.244.0.0/16` and the option `--iface=eth1` in [config/k8s/plugins/flannel/kube-flannel.yaml](./config/k8s/plugins/flannel/kube-flannel.yaml). Be sure to change this options if you want to modify the pod network.
 
@@ -222,18 +220,6 @@ Which results is the subnet taken from [vars/k8s.yaml](/ars/k8s.yaml) and [Vagra
 ```bash
 $ for i in $(kubectl get nodes | grep node | awk '{print $1}'); do kubectl patch node $i -p '{"spec":{"podCIDR":"10.244.0.0/16"}}'; done
 ```
-
-
-3. Services
-
-
-- Sonarqube Error:
-
-~~~
-max virtual memory areas vm.max_map_count [65530] is too low, increase to at least [262144]
-~~~
-
-> *remmediation*: run `sysctl -w vm.max_map_count=26214` on the nodes.
 
 > **Ansible**
 

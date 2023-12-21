@@ -14,10 +14,11 @@
   when: ansible_swaptotal_mb > 0
 
 # Install kubelet, kubeadm and kubectl
-- name: (Debian) Add an apt signing key for Kubernetes
+- name: (Debian) Add a public apt signing key for Kubernetes
   apt_key:
     url: "{{ k8s_apt_gpg_key }}"
     state: "{{ k8s_package_state }}"
+    keyring: "{{ k8s_apt_gpg_key_file }}"
 
 - name: (Debian) Add apt repository for Kubernetes
   apt_repository:

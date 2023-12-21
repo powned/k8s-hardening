@@ -14,9 +14,10 @@ apiserver_cert_extra_sans: "192.168.1.180"
 pod_network_cidr: "10.244.0.0/16"
 
 # Used only for Debian/Ubuntu
-k8s_apt_repository: "deb https://apt.kubernetes.io/ kubernetes-xenial main"
+k8s_apt_gpg_key: "https://pkgs.k8s.io/core:/stable:/v1.29/deb/Release.key"
+k8s_apt_gpg_key_file: "/etc/apt/trusted.gpg.d/kubernetes-apt-keyring.gpg"
+k8s_apt_repository: "deb [signed-by={{ k8s_apt_gpg_key_file }}] https://pkgs.k8s.io/core:/stable:/v1.29/deb/ /"
 k8s_package_state: "present"
-k8s_apt_gpg_key: "https://packages.cloud.google.com/apt/doc/apt-key.gpg.asc"
 
 # Network plugin
 network_plugin: "calico" # "flannel" # See troubleshooting
