@@ -2,34 +2,46 @@
 # Run benchmark and fetch results
 - name: Verify if benchmark folder exists
   stat:
-    path: "{{  remote_home_dir }}/benchmark_k8s/"
+    path: "{{ remote_home_dir }}/benchmark_k8s/"
   register: benchmarkdockerpath
   
 - name: Remove previous benchmark
-  command: "rm -rf {{  remote_home_dir }}/benchmark_k8s/"
+  command: "rm -rf {{ remote_home_dir }}/benchmark_k8s/"
   when: benchmarkdockerpath.stat.exists == True
 
-- name: Copy benchmark scripts
+- name: Copy benchmark folder
   copy:
     src: ../benchmark_k8s/
     dest: "{{  remote_home_dir }}/benchmark_k8s/"
 
+- name: Download kube-bench release from aquasecurity repository
+  get_url:
+    url: "https://github.com/aquasecurity/kube-bench/releases/download/v{{ k8s_benchmark_version }}/kube-bench_{{ k8s_benchmark_version }}_{{ os_architecture }}.tar.gz"
+    dest: "{{ remote_home_dir }}/benchmark_k8s/kube-bench_{{ k8s_benchmark_version }}_{{ os_architecture }}.tar.gz"
+    mode: '0640'
+
+- name: Unarchive kube-bench tar.gz on the remote machine
+  unarchive:
+    src: "{{ remote_home_dir }}/benchmark_k8s/kube-bench_{{ k8s_benchmark_version }}_{{ os_architecture }}.tar.gz"
+    dest: "{{ remote_home_dir }}/benchmark_k8s"
+    remote_src: yes
+
 - name: Verify if go binary is executable
   file:
-    path: "{{  remote_home_dir }}/benchmark_k8s/kube-bench"
+    path: "{{ remote_home_dir }}/benchmark_k8s/kube-bench"
     owner: "{{ user }}"
     group: "{{ group }}"
     mode: "0111"
 
 - name: Run benchmark Kubernetes
-  shell: "{{  remote_home_dir }}/benchmark_k8s/kube-bench --benchmark cis-1.6 | tee {{ inventory_hostname }}-{{  k8s_benchmark_log }}"
+  shell: "{{ remote_home_dir }}/benchmark_k8s/kube-bench --benchmark {{ cis_version }} --config ./cfg/config.yaml --config-dir ./cfg/| tee {{ inventory_hostname }}-{{ k8s_benchmark_log }}"
   args:
-    chdir: "{{  remote_home_dir }}/benchmark_k8s/"
+    chdir: "{{ remote_home_dir }}/benchmark_k8s/"
   register: benchmark_k8s
 
 - name: Fetching benchmark results log
   fetch:
-    src: "{{  remote_home_dir }}/benchmark_k8s/{{ inventory_hostname }}-{{  k8s_benchmark_log }}"
+    src: "{{ remote_home_dir }}/benchmark_k8s/{{ inventory_hostname }}-{{ k8s_benchmark_log }}"
     dest: ../benchmark_k8s/results/
     flat: yes
 

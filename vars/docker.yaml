@@ -1,6 +1,6 @@
 ---
 # Install Docker
-docker_install: true
+docker_install: false # false when the machines have docker installed
 
 # Install Docker Compose
 docker_install_compose: false
@@ -10,7 +10,7 @@ docker_benchmark: false
 docker_benchmark_log: "docker-bench.log"
 
 # A list of users who will be added to the docker group
-docker_users: ['vagrant']
+docker_users: ['vagrant'] # vagrant only when deploying the vagrant cluster
 
 # Edition can be one of: 'ce' (Community Edition) or 'ee' (Enterprise Edition)
 docker_edition: 'ce'
