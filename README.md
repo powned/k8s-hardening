@@ -1,8 +1,10 @@
-# Deprecation Warning: this is a personal project moved from another github Organization. The first commit of that project was on "Tue Apr 6 14:50:56 2021" and the last "Wed Jul 14 21:43:24 2021". At this moment (Wed Dec 20 2023) the project must be updated to the last software versions (ansible, vagrant, docker, k8s, benchs repositories, etc)
-
 # Hardening Docker & Kubernetes - Ansible CIS Benchmark
 
 Secure your Kubernetes cluster with the most good practices from [CIS](https://www.cisecurity.org/cis-benchmarks) in a automated way using Ansible.
+
+### **Why?**
+
+Common kubernetes administrators do not care about security concerns of their On Premise clusters. They use to think that the cluster is securized itself when running on an internal network, or maybe they delegate security concerns to the company security team (CISO). Also, cloud providers offers a kubernetes solution as a service (EKS, AKS, GKE...) but you do not know how these providers implement security features on the cluster you are using. So this solution applies automated checks to measure the security level of your cluster. You will see that it is perfect for running on an On Premise infrastructure due the analogies between deploying a On Premise k8s cluster ant the Vagrant environment of this repo. In this way you can use the Ansible playbooks not only to benchamrk docker and k8s but to configure the kubernetes into a machines network (masters and nodes).
 
 Based on:
 
@@ -10,7 +12,7 @@ Based on:
 
 - [kube-bench](https://github.com/aquasecurity/kube-bench)
 
-You can deploy a Kubernetes cluster completely functional for testing apps/services (increase VM resources in the [Vagrantfile](Vagrantfile) for custom needs). There are some manifests on [config/k8s/services](config/k8s/services) that you can use to provision your cluster. Be sure to add your installation logic in [tasks/services-k8s.yaml](./tasks/services-k8s.yaml). You can control this installation with corresponding variables in [vars/k8s.yaml](vars/k8s.yaml).
+You can deploy a Kubernetes cluster completely functional for testing apps/services using `Vagrant` (increase VM resources in the [Vagrantfile](Vagrantfile) for custom needs). There are some manifests on [config/k8s/services](./config/k8s/services) that you can use to provision apps and services in your cluster. Be sure to add your installation logic in [tasks/services-k8s.yaml](./tasks/services-k8s.yaml). You can control this installation with corresponding variables in [vars/k8s.yaml](vars/k8s.yaml).
 
 > Possible services you can install
 
@@ -18,9 +20,11 @@ You can deploy a Kubernetes cluster completely functional for testing apps/servi
 
 - **Nginx Ingress Controller** (to review/update)
 
-- **ArgoCD** (to review/update)
+- **ArgoCD**
 
 > **TODO**
+
+- Harden k8s cluster. This repo only run tests but not harden the cluster. Securize the k8s masters may be complicated to automate cause parameters variables between environments. Also, these manifests are very important so you may break the cluster if you make a mistake. You can take manifests examples located on [config/k8s/etc/](./config/k8s/etc/).
 
 - Add script for creating TLS Docker certs automatically for being able to connect to the servers Docker daemon.
 
@@ -64,7 +68,18 @@ $ sudo bash benchmark/docker-bench-security.sh -v 20.10.5
 
 ## Configuration / Requirements
 
-> Test
+### Software versions tested:
+
+- Vagrant: v2.4.0
+- Vagrant images: bento/ubuntu-18.04
+- Ansible: core v2.16.1
+- Kubernetes: v1.29
+- Docker: v24.0.2 (build cb74dfc)
+- Docker Compose: v1.17.1 (build unknown)
+- Docker bench: v1.3.5 (modified by me)
+- Kube bench: v0.7.0
+
+### Vagrant dev environment
 
 [Vagrantfile](Vagrantfile) provided for testing Ansible playbooks.
 
@@ -74,7 +89,7 @@ $ sudo bash benchmark/docker-bench-security.sh -v 20.10.5
 
 Kubernetes cluster based on vagrant uses [flannel](https://github.com/flannel-io/flannel#flannel) or [calico](https://docs.projectcalico.org/getting-started/kubernetes/quickstart) as network plugin. See Troubleshooting to handle with possible errors.
 
-> Ansible
+### Ansible
 
 You can deploy the configuration for hardening your machines
 
@@ -88,7 +103,7 @@ You can deploy the configuration for hardening your machines
 
 Run `$ ansible all -m ping` for testing your configuration and check if ansible can connect to your machines.
 
-> Manual benchmark
+### Manual benchmark
 
 If you want to test manually if your cluster is securized...
 
@@ -100,7 +115,7 @@ If you want to test manually if your cluster is securized...
 
 ## Usage
 
-> Test with Vagrant
+### Test with Vagrant
 
 - Install vagrant and run `$ vagrant up`. Now you have a Kubernetes cluster running in virtualbox.
 
@@ -112,7 +127,7 @@ $ journalctl -u kubelet
 $ kubectl get po -n kube-system
 ```
 
-> Ansible checks
+### Ansible checks
 
 Just run the following script [run_playbook.sh](./run_playbook.sh) for configuring and hardening Docker in your hosts.
 
@@ -122,7 +137,7 @@ $ bash run_playbook.sh playbooks/docker-k8s.yaml
 
 Check benchmark logs on [benchmark_docker/results](./benchmark_docker/results) and [benchmark_k8s/results](./benchmark_k8s/results)
 
-> Manual benchmark
+### Manual benchmark
 
 **Please go to [docker-bench-security](https://github.com/docker/docker-bench-security) and [kube-bench](https://github.com/aquasecurity/kube-bench) for further information**
 
@@ -162,7 +177,7 @@ $ kubectl logs $pod_name
 
 ## Troubleshooting
 
-> **Docker**
+### **Docker**
 
 - You should make persistant every new rule you add with `auditctl` (see CIS 1). Check it after restart your environment. Ansible makes these default rules persistent but there may be an error if the paths/files do not exist.
 
@@ -187,20 +202,28 @@ ERROR: for python  Cannot start service python: OCI runtime create failed: conta
 
 > *related to*: CIS 2.8, even `/etc/subuid` `/etc/subgid` are created.
 
-> **Kubernetes**
+### **Containerd**
 
+- Sometimes kubeadm can not start and report the following error:
+
+~~~~
+[ERROR CRI]: container runtime is not running. Validate service connection: validate CRI v1 runtime API for endpoint unix:///var/run/containerd/containerd.sock
+~~~~
+
+> *remmediation*: It is necessary to delete the installation config for containerd. the task "Copy containerd configuration" is implementd on [tasks/configure-docker.yaml](./tasks/configure-docker.yaml) fix the bug. Also review [config/containerd/README.md](./config/containerd/README.md)
+
+### **Kubernetes**
 
 1. Basic troubleshooting
-
 
 ```bash
 $ kubectl get nodes -o wide
 $ kubectl get po -n kube-system
 ```
 
+- [Kubernetes Legacy Package Repositories Will Be Frozen On September 13, 2023](https://kubernetes.io/blog/2023/08/31/legacy-package-repository-deprecation/)
 
 2. Network Plugin
-
 
 - The default CIDR range for **flannel** is `10.244.0.0/16`. If you are using `kubeadm init`, make sure to use `-–pod-network-cidr=10.244.0.0/16`. ***NOTE***: this project implement vagrant tests with `--pod-network-cidr=10.244.0.0/16` and the option `--iface=eth1` in [config/k8s/plugins/flannel/kube-flannel.yaml](./config/k8s/plugins/flannel/kube-flannel.yaml). Be sure to change this options if you want to modify the pod network.
 
@@ -223,17 +246,15 @@ Which results is the subnet taken from [vars/k8s.yaml](/ars/k8s.yaml) and [Vagra
 $ for i in $(kubectl get nodes | grep node | awk '{print $1}'); do kubectl patch node $i -p '{"spec":{"podCIDR":"10.244.0.0/16"}}'; done
 ```
 
-
-3. Services
-
-
-- Sonarqube Error:
+### **Ansible**
 
 ~~~
-max virtual memory areas vm.max_map_count [65530] is too low, increase to at least [262144]
+ERROR! [DEPRECATED]: ansible.builtin.include has been removed. Use include_tasks or import_tasks instead. This feature was removed from ansible-core in a release after 2023-05-16. Please update your playbooks.
+Ansible failed to complete successfully. Any error output should be
+visible above. Please fix these errors and try again.
 ~~~
 
-> *remmediation*: run `sysctl -w vm.max_map_count=26214` on the nodes.
+> *remmediation*: check your ansible version.
 
 ## References
 
