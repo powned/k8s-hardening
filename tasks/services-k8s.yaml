@@ -10,7 +10,7 @@
     - name: Install ArgoCD
       command: "{{ item }}"
       with_items:
-        - "kubectl create namespace argocd"
+        - "kubectl apply -f /home/{{ user }}/services/argocd/namespace.yaml"
         - "kubectl apply -n argocd -f /home/{{ user }}/services/argocd/install.yaml"
       become: false
       when: argocd_install | bool
@@ -21,3 +21,4 @@
         - "kubectl apply -f /home/{{ user }}/services/nginx/deploy.yaml"
       become: false
       when: nginx_install | bool
+  when: inventory_hostname == "{{ k8s_master_name }}"
