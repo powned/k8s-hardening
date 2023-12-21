@@ -187,6 +187,16 @@ ERROR: for python  Cannot start service python: OCI runtime create failed: conta
 
 > *related to*: CIS 2.8, even `/etc/subuid` `/etc/subgid` are created.
 
+> **Containerd**
+
+- Sometimes kubeadm can not start and report the following error:
+
+~~~~
+[ERROR CRI]: container runtime is not running. Validate service connection: validate CRI v1 runtime API for endpoint unix:///var/run/containerd/containerd.sock
+~~~~
+
+> *remmediation*: It is necessary to delete the installation config for containerd. the task "Copy containerd configuration" is implementd on [tasks/configure-docker.yaml](./tasks/configure-docker.yaml) fix the bug. Also review [config/containerd/README.md](./config/containerd/README.md)
+
 > **Kubernetes**
 
 1. Basic troubleshooting

@@ -23,12 +23,12 @@
     - name: (Debian) Add Docker GPG apt key
       apt_key:
         url: "{{ docker_apt_gpg_key }}"
-        state: "{{ docker_package_state }}"  
+        state: "{{ docker_package_state }}"
 
     - name: (Debian) Add Docker repository
       apt_repository:
         repo: "{{ docker_apt_repository }}"
-        state: "{{ docker_package_state }}"  
+        state: "{{ docker_package_state }}"
 
     - name: (Debian) Update apt and install docker-ce
       apt:
@@ -37,7 +37,24 @@
           - docker-ce-cli
           - containerd.io
         update_cache: yes
-        state: "{{ docker_package_state }}"  
+        state: "{{ docker_package_state }}"
+
+    - name: Remove containerd previous configuration
+      command: "rm -f /etc/containerd/config.toml"
+
+    - name: Copy containerd default configuration
+      copy:
+        src: ../config/containerd/config.toml
+        dest: /etc/containerd/
+        owner: root
+        group: root
+        mode: "0644"
+
+    - name: Ensure containerd is started and enabled at boot
+      service:
+        name: containerd
+        state: restarted
+        enabled: true
   when: ansible_os_family == 'Debian'
   become: true
   become_user: root
