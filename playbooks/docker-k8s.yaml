@@ -8,10 +8,10 @@
     - "../vars/host-config.yaml"
   tasks:
     - name: Configure all machines
-      include: ../tasks/configure-hosts.yaml
+      include_tasks: ../tasks/configure-hosts.yaml
 
     - name: Provision and benchmark Docker and Kubernetes
-      include: ../tasks/main.yaml
+      include_tasks: ../tasks/main.yaml
 
     - name: Clear packages on all machines
-      include: ../tasks/autoremove.yaml
+      include_tasks: ../tasks/autoremove.yaml

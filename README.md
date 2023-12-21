@@ -235,6 +235,16 @@ max virtual memory areas vm.max_map_count [65530] is too low, increase to at lea
 
 > *remmediation*: run `sysctl -w vm.max_map_count=26214` on the nodes.
 
+> **Ansible**
+
+~~~
+ERROR! [DEPRECATED]: ansible.builtin.include has been removed. Use include_tasks or import_tasks instead. This feature was removed from ansible-core in a release after 2023-05-16. Please update your playbooks.
+Ansible failed to complete successfully. Any error output should be
+visible above. Please fix these errors and try again.
+~~~
+
+> *remmediation*: check your ansible version.
+
 ## References
 
 **Docker**
