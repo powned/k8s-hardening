@@ -24,4 +24,4 @@ network_plugin: "calico" # "flannel" # See troubleshooting
 
 # Install services
 argocd_install: true
-nginx_install: true
+nginx_install: false
