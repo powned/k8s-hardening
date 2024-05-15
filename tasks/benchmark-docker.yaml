@@ -152,37 +152,37 @@
 # Finally run benchmark and fetch results
 - name: Verify if benchmark folder exists
   stat:
-    path: "{{  remote_home_dir }}/benchmark_docker/"
+    path: "{{  remote_home_dir }}/benchmark-docker/"
   register: benchmarkdockerpath
   
 - name: Remove previous benchmark
-  command: "rm -rf {{  remote_home_dir }}/benchmark_docker/"
+  command: "rm -rf {{  remote_home_dir }}/benchmark-docker/"
   when: benchmarkdockerpath.stat.exists == True
 
 - name: Copy benchmark scripts
   copy:
-    src: ../benchmark_docker/
-    dest: "{{  remote_home_dir }}/benchmark_docker/"
+    src: ../benchmark-docker/
+    dest: "{{  remote_home_dir }}/benchmark-docker/"
     owner: "root"
     group: "root"
 
 - name: Run benchmark Docker
-  command: "bash {{  remote_home_dir }}/benchmark_docker/docker-bench-security.sh -l {{ inventory_hostname }}-{{  docker_benchmark_log }}"
+  command: "bash {{  remote_home_dir }}/benchmark-docker/docker-bench-security.sh -l {{ inventory_hostname }}-{{  docker_benchmark_log }}"
   args:
-    chdir: "{{  remote_home_dir }}/benchmark_docker/"
-  register: benchmark_docker
+    chdir: "{{  remote_home_dir }}/benchmark-docker/"
+  register: benchmark-docker
 
 - name: Fetching benchmark results log
   fetch:
-    src: "{{  remote_home_dir }}/benchmark_docker/{{ inventory_hostname }}-{{  docker_benchmark_log }}"
-    dest: ../benchmark_docker/results/
+    src: "{{  remote_home_dir }}/benchmark-docker/{{ inventory_hostname }}-{{  docker_benchmark_log }}"
+    dest: ../benchmark-docker/results/
     flat: yes
 
 - name: Fetching benchmark results json
   fetch:
-    src: "{{  remote_home_dir }}/benchmark_docker/{{ inventory_hostname }}-{{  docker_benchmark_log }}.json"
-    dest: ../benchmark_docker/results/
+    src: "{{  remote_home_dir }}/benchmark-docker/{{ inventory_hostname }}-{{  docker_benchmark_log }}.json"
+    dest: ../benchmark-docker/results/
     flat: yes
 
 - name: Remove benchmark
-  command: "rm -rf {{  remote_home_dir }}/benchmark_docker/"
+  command: "rm -rf {{  remote_home_dir }}/benchmark-docker/"
