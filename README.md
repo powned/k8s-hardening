@@ -33,11 +33,11 @@ You can deploy a Kubernetes cluster completely functional for testing apps/servi
 - Add more services for testing and hack.
 
 
-> **New features for docker-bench-security** that you can see on [benchmark_docker](./benchmark_docker/)
+> **New features for docker-bench-security** that you can see on [benchmark-docker](./benchmark-docker/)
 
 - Ansible configuration.
 
-- New argument `-v` for [benchmark/docker-bench-security.sh](./benchmark_docker/docker-bench-security.sh). You can pass the Docker official version and check if corresponds with yours.
+- New argument `-v` for [benchmark/docker-bench-security.sh](./benchmark-docker/docker-bench-security.sh). You can pass the Docker official version and check if corresponds with yours.
 
 ```bash
 $ sudo bash benchmark/docker-bench-security.sh -v 20.10.5
@@ -107,7 +107,7 @@ Run `$ ansible all -m ping` for testing your configuration and check if ansible 
 
 If you want to test manually if your cluster is securized...
 
-- Copy [benchmark_docker](./benchmark_docker) folder to your remote machines.
+- Copy [benchmark-docker](./benchmark-docker) folder to your remote machines.
 
 - Copy the [config/docker/daemon.json](config/docker/daemon.json) to the Docker Daemon config path (by default `/etc/docker/daemon.json`) on your remote machines. You can add more options from [config/docker/daemon-template.json](./config/docker/daemon-template.json). **NOTE**: care about `"userns-remap"` option (see Troubleshooting part for further information).
 
@@ -135,7 +135,7 @@ Just run the following script [run_playbook.sh](./run_playbook.sh) for configuri
 $ bash run_playbook.sh playbooks/docker-k8s.yaml
 ```
 
-Check benchmark logs on [benchmark_docker/results](./benchmark_docker/results) and [benchmark_k8s/results](./benchmark_k8s/results)
+Check benchmark logs on [benchmark-docker/results](./benchmark-docker/results) and [benchmark-k8s/results](./benchmark-k8s/results)
 
 ### Manual benchmark
 
@@ -161,14 +161,14 @@ A complete list of checks is present in [functions_lib.sh](functions_lib.sh).
 
 **kube-bench**
 
-This proejct automate k8s benchmark using a go binary (kube-bench from [benchmark-k8s](./benchmark_k8s)). You can run
+This proejct automate k8s benchmark using a go binary (kube-bench from [benchmark-k8s](./benchmark-k8s)). You can run
 
 ```bash
 $ ./kube-bench --help
 $ ./kube-bench --benchmark cis-1.6
 ```
 
-For instance, with [benchmark-k8s/job.yaml](./benchmark_k8s/job.yaml) you will deploy a pod that bench the cluster
+For instance, with [benchmark-k8s/job.yaml](./benchmark-k8s/job.yaml) you will deploy a pod that bench the cluster
 
 ```bash
 $ kubectl apply -f job.yaml
